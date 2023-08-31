@@ -9,6 +9,7 @@ import {
   ScrollView,
 } from "react-native";
 import { theme } from "./color";
+import { storage } from "./mmkv";
 
 export default function App() {
   const [working, setWorking] = useState(true);
@@ -21,9 +22,12 @@ export default function App() {
     if (text === "") return;
     const newToDos = {
       ...toDos,
-      [Date.now()]: { text, work: working },
+      [Date.now()]: { text, working },
     };
     setToDos(newToDos);
+    const jsonValue = JSON.stringify(toDos);
+    storage.set("toDos", "Marc");
+    console.log(storage.getString("toDos"));
     setText("");
   };
   return (
@@ -55,11 +59,13 @@ export default function App() {
         onSubmitEditing={addToDo}
       />
       <ScrollView>
-        {Object.keys(toDos).map((key) => (
-          <View style={styles.toDo} key={key}>
-            <Text style={styles.toDoText}>{toDos[key].text}</Text>
-          </View>
-        ))}
+        {Object.keys(toDos).map((key) =>
+          toDos[key].working === working ? (
+            <View style={styles.toDo} key={key}>
+              <Text style={styles.toDoText}>{toDos[key].text}</Text>
+            </View>
+          ) : null
+        )}
       </ScrollView>
     </View>
   );
